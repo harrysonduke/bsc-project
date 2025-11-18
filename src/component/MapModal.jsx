@@ -105,7 +105,7 @@ const MapModal = ({ onClose, onSelectLocation }) => {
           Select Location
         </h2>
         <MapContainer
-          center={[7.3056, 5.1357]}
+          center={[6.8567, 7.3958]}
           zoom={20}
           style={{ height: "70%" }}
         >

@@ -8,6 +8,7 @@ import Attendance from "./page/Attendance";
 import SuccessPage from "./page/SuccessPage";
 import ClassDetails from "./page/ClassDetails";
 import PreviousClass from "./page/PreviousClass";
+import AnalyticsDashboard from "./page/Analytics"; // Add this import
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
   {
     path: "/previousClass",
     element: <PreviousClass />,
+  },
+  {
+    path: "/analytics", // Add this route
+    element: <AnalyticsDashboard />,
   },
   {
     path: "/success",

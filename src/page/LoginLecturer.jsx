@@ -7,6 +7,7 @@ import Input from "../component/Input";
 import { Link } from "react-router-dom";
 import Spinner from "../component/Spinner";
 import toast from "react-hot-toast";
+import { FiMail, FiLock, FiLogIn } from "react-icons/fi";
 
 const LoginLecturer = () => {
   const navigate = useNavigate();
@@ -15,13 +16,14 @@ const LoginLecturer = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
     try {
-      // Sign in the lecturer with email and password
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -29,80 +31,195 @@ const LoginLecturer = () => {
 
       if (error) throw error;
 
-      // Redirect to the class schedule
-      toast.success("Login successful");
+      toast.success("Welcome back! 🎉");
       navigate("/classDetails");
     } catch (error) {
       setError(error.error_description || error.message);
-      toast.error(`${error.error_description || error.message}`);
+      toast.error(error.error_description || error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <section>
-      <div className="grid md:grid-cols-2">
-        <div className="px-6 lg:px-[133px] overflow-scroll h-[100vh] pb-8">
-          <div className="flex flex-col mt-5 items-center">
-            <img src={Logo} alt="login logo" className="w-32" />
-            <h2 className="text-[#000D46] font-bold text-2xl mt-2 mb-6">
-              Welcome Back!
-            </h2>
-          </div>
-          <form onSubmit={handleLogin}>
-            <div className="grid gap-y-4">
-              <Input
-                type="email"
-                label="Email"
-                placeholder="Enter your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <Input
-                type="password"
-                label="Password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+    <section className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="grid lg:grid-cols-2 min-h-screen">
+        {/* Left Side - Form */}
+        <div className="flex items-center justify-center p-6 lg:p-12">
+          <div className="w-full max-w-md">
+            {/* Logo and Header */}
+            <div className="text-center mb-8">
+              <img src={Logo} alt="login logo" className="w-24 mx-auto mb-4" />
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                Welcome Back!
+              </h1>
+              <p className="text-gray-600">Login to continue managing your classes</p>
             </div>
 
-            {error && <p className="text-red-500">{error}</p>}
+            {/* Login Form */}
+            <form onSubmit={handleLogin} className="space-y-6">
+              {/* Email */}
+              <div className="relative">
+                <div className="absolute left-4 top-12 text-purple-600">
+                  <FiMail />
+                </div>
+                <div className="pl-8">
+                  <Input
+                    type="email"
+                    label="Email Address"
+                    placeholder="your.email@university.edu"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
 
-            <button
-              className="btn bg-[#000D46] disabled:bg-[#000D46] disabled:cursor-not-allowed text-white btn-block mt-6 text-base font-bold"
-              type="submit"
-              disabled={isLoading}
-            >
-              {isLoading ? <Spinner /> : "Login"}
-            </button>
-          </form>
+              {/* Password */}
+              <div className="relative">
+                <div className="absolute left-4 top-12 text-blue-600">
+                  <FiLock />
+                </div>
+                <div className="pl-8">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    label="Password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
 
-          <p className="mt-3 text-[#1E1E1E] text-center">
-            Don&apos;t have an account?{" "}
-            <Link
-              className="text-[#000D46] font-semibold"
-              to={"/registerLecturer"}
-            >
-              Register Now
-            </Link>
-          </p>
+              {/* Show Password Toggle */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={showPassword}
+                    onChange={(e) => setShowPassword(e.target.checked)}
+                    className="checkbox checkbox-sm checkbox-primary"
+                  />
+                  <label className="text-sm text-gray-700">Show password</label>
+                </div>
+                <button
+                  type="button"
+                  className="text-sm text-blue-600 hover:text-purple-600 font-semibold transition-colors"
+                >
+                  Forgot Password?
+                </button>
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
+                  <p className="text-red-800 text-sm font-semibold">⚠️ {error}</p>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                className="w-full btn bg-gradient-to-r from-blue-600 to-purple-600 text-white border-none hover:shadow-xl transition-all text-lg py-4"
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Spinner />
+                    Logging in...
+                  </>
+                ) : (
+                  <>
+                    <FiLogIn /> Login to Dashboard
+                  </>
+                )}
+              </button>
+
+              {/* Register Link */}
+              <p className="text-center text-gray-600">
+                Don't have an account?{" "}
+                <Link
+                  className="text-blue-600 font-semibold hover:text-purple-600 transition-colors"
+                  to={"/registerLecturer"}
+                >
+                  Register now
+                </Link>
+              </p>
+            </form>
+
+            {/* Trust Badges */}
+            <div className="mt-8 flex items-center justify-center gap-6 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <span className="text-green-600">🔒</span>
+                <span>Secure Login</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-600">⚡</span>
+                <span>Fast Access</span>
+              </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="mt-8 grid grid-cols-3 gap-4">
+              <div className="text-center p-3 bg-white rounded-xl shadow-sm">
+                <div className="text-xl font-bold text-blue-600">1000+</div>
+                <div className="text-xs text-gray-600">Lecturers</div>
+              </div>
+              <div className="text-center p-3 bg-white rounded-xl shadow-sm">
+                <div className="text-xl font-bold text-purple-600">50K+</div>
+                <div className="text-xs text-gray-600">Students</div>
+              </div>
+              <div className="text-center p-3 bg-white rounded-xl shadow-sm">
+                <div className="text-xl font-bold text-green-600">99%</div>
+                <div className="text-xs text-gray-600">Uptime</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Start of  Side Image (only shown on Large screen) */}
-        <div>
+        {/* Right Side - Image with Overlay */}
+        <div className="hidden lg:block relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/40 to-purple-600/40 z-10"></div>
           <img
             src={loginImg}
-            alt="login screen image"
-            className="h-[100vh] hidden md:block w-full object-cover"
+            alt="login screen"
+            className="h-full w-full object-cover"
           />
+          <div className="absolute inset-0 flex items-center justify-center z-20 p-12">
+            <div className="text-white text-center max-w-lg">
+              <h2 className="text-5xl font-bold mb-6">Smart Attendance</h2>
+              <p className="text-xl mb-8 leading-relaxed">
+                Track attendance seamlessly with QR codes and geolocation verification
+              </p>
+              <div className="space-y-4">
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-left">
+                  <div className="flex items-center gap-4 mb-3">
+                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl">
+                      📊
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg">Real-time Analytics</h3>
+                      <p className="text-sm text-blue-100">Track attendance trends instantly</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-left">
+                  <div className="flex items-center gap-4 mb-3">
+                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl">
+                      🎯
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg">Easy to Use</h3>
+                      <p className="text-sm text-blue-100">Simple interface for everyone</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* End of  Side Image (only shown on Large screen) */}
     </section>
   );
 };
